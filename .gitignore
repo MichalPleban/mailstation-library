@@ -1,0 +1,11 @@
+*.lk
+*.map
+*.noi
+*.lst
+*.sym
+*.map
+*.rel
+*.asm
+bin/app.ihx
+bin/dataflash.bin
+emulator.bat
