@@ -17,6 +17,16 @@ uint8_t read_port(uint8_t port) __naked
     port;
 }
 
+void write_port(uint8_t port, uint8_t value) __naked
+{
+    __asm
+    ld c, a
+    out (c), l
+    ret
+    __endasm;
+    port; value;
+}
+
 void increment_timer(void)
 {
     lf_timer++;
@@ -47,6 +57,7 @@ void display_ports(void)
     ms_put_string(buffer, false);
     ms_screen_update(NULL);
     time_diff = (ms_get_timer() - timer) & 0xFF;
+    if(ms_keyboard.last_key == MS_KEY_POWER) ms_power_off();
 }
 
 void test_ports(void)

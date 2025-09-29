@@ -59,13 +59,13 @@ src/lib/font.rel: src/lib/font.c include/mailstation.h
 app: bin/app.bin bin/dataflash.bin bin/app-ldr.bin
 
 bin/app-ldr.bin: bin/app.bin
-	copy /b src\test\trampoline.bin + bin\app.bin bin\app-ldr.bin
+	cat bin/trampoline.bin bin/app.bin > bin/app-ldr.bin
 
 bin/app.bin: bin/app.ihx
 	objcopy -Iihex -Obinary $< $@
 
 bin/app.ihx: bin/crt0-app.rel bin/libmailstation.lib src/app/app.rel src/app/icon.rel src/app/ports.rel
-	$(CC) $(CFLAGS) $(LDFLAGS) --code-loc 0x4030 --data-loc 0xD800 $^ -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) --code-loc 0x4030 --data-loc 0xD600 $^ -o $@
 
 src/app/app.rel: src/app/app.c include/mailstation.h
 	$(CC) $(CFLAGS) -c $< -o $@

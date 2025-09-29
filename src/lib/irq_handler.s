@@ -2,7 +2,7 @@
 .globl _ms_port_shadow
 .globl _ms_irq_handlers
 
-IRQ_HANDLER_PAGE = 0xD6
+IRQ_HANDLER_PAGE = 0xD5
 
 _ms_install_irq_handler::
 
@@ -12,16 +12,16 @@ _ms_install_irq_handler::
     ; Of course the custom SoC is not going to do that, so when the interrupt occurs,
     ;  a random byte will be on the bus so the CPU will read a random location
     ;  within the specified interrupt vector page.
-    ; To counter this, we fill the entire page with a 0xD6 byte. This way, the CPU
-    ;  will always go to 0xD6D6 upon interrupt.
+    ; To counter this, we fill the entire page with a 0xD5 byte. This way, the CPU
+    ;  will always go to 0xD5D5 upon interrupt.
     ; Then we place a jump instruction at that location to our actual IRQ handler
-    ;  which we place at 0xD600.
+    ;  which we place at 0xD501.
     ; As long as the IRQ handler does not exceed 192 bytes so that it doesn't overwrite
-    ;  the jump instruction at 0xD6D6, this elaborate scheme will work.
-    ; This also ensures optimal memory usage - the RAM at 0xD500 oto 0xD6D8 is used
+    ;  the jump instruction at 0xD5D5, this elaborate scheme will work.
+    ; This also ensures optimal memory usage - the RAM at 0xD400 oto 0xD5D7 is used
     ;  by the interrupt code, and the rest is free for other uses.
 
-    ; First, fill the entire page at 0xD500 with 0xD6.
+    ; First, fill the entire page at 0xD400 with 0xD5.
 
     ld b, #0
     ld hl, #((IRQ_HANDLER_PAGE - 1) * 0x100)
@@ -35,7 +35,7 @@ _ms_install_irq_handler::
 
     ld (hl), #IRQ_HANDLER_PAGE
 
-    ; Then place a jump instruction at 0xD6D6 to our IRQ handler.
+    ; Then place a jump instruction at 0xD5D5 to our IRQ handler.
 
     ld hl, #(IRQ_HANDLER_PAGE * 0x100 + IRQ_HANDLER_PAGE)
     ld (hl), #0xC3      ; JP nn opcode
@@ -44,7 +44,7 @@ _ms_install_irq_handler::
     inc hl
     ld (hl), #IRQ_HANDLER_PAGE      ; High byte of routine address
 
-    ; Now copy the actual interrupt handler routine to the location at 0xD601.
+    ; Now copy the actual interrupt handler routine to the location at 0xD501.
 
     ld hl, #_ms_irq_handler
     ld de, #(IRQ_HANDLER_PAGE * 0x100 + 1)

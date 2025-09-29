@@ -7,6 +7,9 @@ ms_port_shadow_t ms_port_shadow;
 
 void ms_init_ports(void)
 {
+    // Screen at 0xC000
+    ms_port_screen_page = 0x00;
+
     // All interrupts enabled.
     ms_port_shadow.irq_mask = ms_port_irq_mask = 0xFF;
 
