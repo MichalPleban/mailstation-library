@@ -19,7 +19,7 @@ static void ms_64hz_irq(void);
  *  appropriate ones based on the IRQ level.
  */
 typedef struct ms_irq_handler_t {
-    uint8_t level;          // IRQ level + 1 (this way 0 denotes end of list)
+    uint8_t level;              // IRQ level + 1 (this way 0 denotes end of list)
     uint8_t port;               // Port number for device selection at 0x4000 or 0x8000
     uint8_t device;             // Device number (MS_DEVICE_*)
     uint8_t bank;               // Bank number
@@ -35,6 +35,7 @@ void ms_init_irq(void)
 {
     ms_irq_handlers[0].level = 0;
     dummy_byte = 0;
+    ms_timer = 0;
     ms_install_irq_handler();
     ms_add_irq_handler(MS_IRQ_LEVEL_64HZ, ms_current_device(), ms_current_bank(), ms_64hz_irq);
 }

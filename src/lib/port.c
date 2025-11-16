@@ -7,8 +7,8 @@ ms_port_shadow_t ms_port_shadow;
 
 void ms_init_ports(void)
 {
-    // Screen at 0xC000
-    ms_port_screen_page = 0x00;
+    // Screen at 0xC100
+    ms_port_screen_page = 0x01;
 
     // All interrupts enabled.
     ms_port_shadow.irq_mask = ms_port_irq_mask = 0xFF;
@@ -26,7 +26,7 @@ void ms_init_ports(void)
 
     // Disable power off lines (obviously)
     ms_port_shadow.gpio4 = ms_port_gpio4 = 0x00;
-    ms_port_gpio4_dir = 0x3;
+    ms_port_gpio4_dir = 0x03;
 
     // Printer port data lines
     ms_port_shadow.gpio5 = ms_port_gpio5 = 0x00;

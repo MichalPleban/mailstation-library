@@ -134,7 +134,7 @@ __sfr __at 0x2F ms_port_irq_speed;
  * The linker directive --data-loc 0xC200 can be used for this.
  ***************************************************************************************/
 
-__at 0xC000 uint8_t ms_screen_buffer[5120];
+__at 0xC100 uint8_t ms_screen_buffer[5120];
 
 extern ms_screen_t ms_screen;
 

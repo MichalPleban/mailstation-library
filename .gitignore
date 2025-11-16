@@ -9,3 +9,5 @@
 bin/app.ihx
 bin/dataflash.bin
 emulator.bat
+tmp/*
+

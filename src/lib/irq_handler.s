@@ -2,7 +2,7 @@
 .globl _ms_port_shadow
 .globl _ms_irq_handlers
 
-IRQ_HANDLER_PAGE = 0xD5
+IRQ_HANDLER_PAGE = 0xD6
 
 _ms_install_irq_handler::
 

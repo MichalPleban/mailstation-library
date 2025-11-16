@@ -1,2 +1,3 @@
 Check box 2 of port 28 (input in firmware 3x, output in firmware 4.x).
 Check port 0x0C
+Check why writing the first LCD column must be done twice?

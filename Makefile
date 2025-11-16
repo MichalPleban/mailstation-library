@@ -65,7 +65,7 @@ bin/app.bin: bin/app.ihx
 	objcopy -Iihex -Obinary $< $@
 
 bin/app.ihx: bin/crt0-app.rel bin/libmailstation.lib src/app/app.rel src/app/icon.rel src/app/ports.rel
-	$(CC) $(CFLAGS) $(LDFLAGS) --code-loc 0x4030 --data-loc 0xD600 $^ -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) --code-loc 0x4030 --data-loc 0xD700 $^ -o $@
 
 src/app/app.rel: src/app/app.c include/mailstation.h
 	$(CC) $(CFLAGS) -c $< -o $@

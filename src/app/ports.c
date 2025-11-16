@@ -38,6 +38,7 @@ void display_ports(void)
     uint8_t base;
     uint32_t timer;
     static uint16_t time_diff;
+    uint8_t input;
 
     timer = ms_get_timer();
     ms_position_cursor(0, 0);
@@ -53,7 +54,7 @@ void display_ports(void)
     ms_put_string(buffer, false);
     sprintf(buffer, "\nKbd:    Flags=%02X Last=%02X", ms_keyboard.modifier_state, ms_keyboard.last_key);
     ms_put_string(buffer, false);
-    sprintf(buffer, "\nOther:  Test=%02X Test2=%02X Screen=%02X", ms_screen.test, ms_port_gpio4, ms_screen_type());
+    sprintf(buffer, "\nScreen: %02X", ms_screen_type());
     ms_put_string(buffer, false);
     ms_screen_update(NULL);
     time_diff = (ms_get_timer() - timer) & 0xFF;
@@ -67,6 +68,7 @@ void test_ports(void)
     ms_screen_clear();
     ms_enable_led(true);
     ms_cpu_speed(MS_CPU_12MHZ);
+    display_ports();
     while(true)
     {
         display_ports();

@@ -44,6 +44,12 @@ static const uint8_t ms_reverse_bytes[256] = {
 void ms_init_screen(void)
 {
     ms_screen.type = ms_screen_type();
+    if(ms_screen.type == MS_SCREEN_NEW)
+    {
+        // Unknown but needed to keep the screen running
+        ms_port_shadow.gpio4 = ms_port_gpio4 = 0x04;
+        ms_port_gpio4_dir = 0x07;
+    }
     ms_screen_clear();
 }
 
