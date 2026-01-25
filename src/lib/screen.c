@@ -44,12 +44,6 @@ static const uint8_t ms_reverse_bytes[256] = {
 void ms_init_screen(void)
 {
     ms_screen.type = ms_screen_type();
-    if(ms_screen.type == MS_SCREEN_NEW)
-    {
-        // Unknown but needed to keep the screen running
-        ms_port_shadow.gpio4 = ms_port_gpio4 = 0x04;
-        ms_port_gpio4_dir = 0x07;
-    }
     ms_screen_clear();
 }
 
@@ -58,7 +52,7 @@ void ms_screen_clear(void)
     memset(ms_screen_buffer, 0x00, sizeof(ms_screen_buffer));
     ms_screen.cursor_x = 0;
     ms_screen.cursor_y = 0;
-    ms_screen_update(NULL);
+    ms_screen_update();
 }
 
 void ms_position_cursor(uint8_t x, uint8_t y)
@@ -79,7 +73,7 @@ void ms_draw_char(char c, bool refresh)
     }
     if(ms_screen.type == MS_SCREEN_OLD && refresh)
     {
-        ms_screen_update_column(ms_screen.cursor_x, ms_screen_buffer + ms_screen.cursor_x*128);
+        ms_screen_update_column(ms_screen.cursor_x, ms_screen_buffer + ms_screen.cursor_x);
     }
 }
 
@@ -105,7 +99,7 @@ void ms_screen_scroll(bool refresh)
         memset(src_ptr + 128 - 8, 0x00, 8);
         src_ptr += 128;
     }
-    if(refresh) ms_screen_update(NULL);
+    if(refresh) ms_screen_update();
 }
 
 void ms_advance_cursor(bool scroll, bool refresh_on_scroll)
@@ -154,23 +148,19 @@ void ms_put_string(const char *str, bool refresh)
     }
 }
 
-void ms_screen_update(uint8_t *buffer)
+void ms_screen_update()
 {
     unsigned char screen_column;
     uint8_t *ptr;
 
     if(ms_screen.type == MS_SCREEN_NEW) return;
 
-    if(buffer == NULL) buffer = ms_screen_buffer;
-
-    ptr = buffer;
+    ptr = ms_screen_buffer;
     for(screen_column = 0; screen_column < 40; screen_column++)
     {
         ms_screen_update_column(screen_column, ptr);
         ptr += 1;
     }
-    // TODO: why is this needed? Without it the first column is not updated properly.
-    ms_screen_update_column(0, buffer);
 }
 
 void ms_screen_update_column(uint8_t column, uint8_t *buffer)
@@ -178,7 +168,7 @@ void ms_screen_update_column(uint8_t column, uint8_t *buffer)
     uint8_t device_8000;
     uint8_t lcd_device = MS_DEVICE_LCD_LEFT;
     volatile uint8_t *lcd_ptr = (uint8_t *)0x8038;
-    unsigned char i;
+    volatile uint8_t i;
 
     if(ms_screen.type == MS_SCREEN_NEW) return;
 
@@ -191,17 +181,18 @@ void ms_screen_update_column(uint8_t column, uint8_t *buffer)
     device_8000 = ms_port_8000_device;
     ms_port_8000_device = lcd_device;
 
-    __asm__("di");
-    ms_port_gpio1 = ms_port_shadow.gpio1 & ~MS_GPIO1_LCD_COLUMN;
-    *lcd_ptr = 19-column;
-    ms_port_gpio1 = ms_port_shadow.gpio1 | MS_GPIO1_LCD_COLUMN;
-    __asm__("ei");
-
-    for(i = 0; i < 128; i++)
+    __critical
     {
-        *lcd_ptr = ms_reverse_bytes[*buffer];
-        buffer += 40;
-        lcd_ptr++;
+        ms_port_gpio1 = ms_port_shadow.gpio1 & ~MS_GPIO1_LCD_COLUMN;
+        *lcd_ptr = 19-column;
+        ms_port_gpio1 = ms_port_shadow.gpio1 | MS_GPIO1_LCD_COLUMN;
+
+        for(i = 0; i < 128; i++)
+        {
+            *lcd_ptr = ms_reverse_bytes[*buffer];
+            buffer += 40;
+            lcd_ptr++;
+        }
     }
 
     ms_port_8000_device = device_8000;

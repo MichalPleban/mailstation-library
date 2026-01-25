@@ -8,7 +8,7 @@ ms_port_shadow_t ms_port_shadow;
 void ms_init_ports(void)
 {
     // Screen at 0xC100
-    ms_port_screen_page = 0x01;
+    ms_port_screen_page = 0x00;
 
     // All interrupts enabled.
     ms_port_shadow.irq_mask = ms_port_irq_mask = 0xFF;
@@ -25,8 +25,8 @@ void ms_init_ports(void)
     ms_port_gpio2_dir = 0x0F;
 
     // Disable power off lines (obviously)
-    ms_port_shadow.gpio4 = ms_port_gpio4 = 0x00;
-    ms_port_gpio4_dir = 0x03;
+    ms_port_shadow.gpio4 = ms_port_gpio4 = 0x04;
+    ms_port_gpio4_dir = 0x0F;
 
     // Printer port data lines
     ms_port_shadow.gpio5 = ms_port_gpio5 = 0x00;
@@ -51,7 +51,7 @@ void ms_power_off(void)
     ms_port_gpio4 = ms_port_shadow.gpio4 | MS_GPIO4_POWER_OFF;
 }
 
-void ms_enable_lcd(bool on)
+void ms_enable_lcd(bool on) __critical
 {
     if(on)
         ms_port_shadow.gpio1 = ms_port_gpio1 = ms_port_shadow.gpio1 | MS_GPIO1_LCD_ON;
@@ -59,7 +59,7 @@ void ms_enable_lcd(bool on)
         ms_port_shadow.gpio1 = ms_port_gpio1 = ms_port_shadow.gpio1 & ~MS_GPIO1_LCD_ON;
 }
 
-void ms_enable_led(bool on)
+void ms_enable_led(bool on) __critical
 {
     if(on)
         ms_port_shadow.gpio1 = ms_port_gpio1 = ms_port_shadow.gpio1 | MS_GPIO1_LED_ON;

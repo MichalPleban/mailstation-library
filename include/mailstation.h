@@ -40,7 +40,13 @@ typedef struct ms_keyboard_t {
 	bool key_pressed;
 	bool caps_pressed;
 	uint8_t repeat_delay;
+	uint8_t type;
 } ms_keyboard_t;
+
+typedef struct ms_modem_t {
+    bool enabled;
+    uint8_t type;
+} ms_modem_t;
 
 /***************************************************************************************
  * Hardware port definitions.
@@ -66,7 +72,7 @@ __sfr __at 0x07 ms_port_8000_page;
 __sfr __at 0x08 ms_port_8000_device;
 __sfr __at 0x00 ms_port_screen_page;
 
-__sfr __at 0x0D ms_port_cpu_speed;
+__sfr __at 0x26 ms_port_modem_reset;
 
 __sfr __at 0x10 ms_port_seconds_low;
 __sfr __at 0x11 ms_port_seconds_high;
@@ -85,6 +91,7 @@ __sfr __at 0x1D ms_port_rtc_control;
 __sfr __at 0x1E ms_port_rtc_test;
 __sfr __at 0x1F ms_port_rtc_reset;
 
+__sfr __at 0x0D ms_port_cpu_speed;
 __sfr __at 0x2F ms_port_irq_speed;
 
 /***************************************************************************************
@@ -127,20 +134,42 @@ __sfr __at 0x2F ms_port_irq_speed;
 #define MS_IRQ_LEVEL_CALLERID       7
 
 /***************************************************************************************
- * Library variables
- * 
- * Because the library uses the memory at 0xC000-0xC1FF for interrupt handling,
- *  the variables should be placed in RAM starting at 0xC200.
- * The linker directive --data-loc 0xC200 can be used for this.
+ * Modem registers and constants.
  ***************************************************************************************/
 
-__at 0xC100 uint8_t ms_screen_buffer[5120];
+#define MS_MODEM_BUFFER     0x00
+#define MS_MODEM_IER        0x01
+#define MS_MODEM_DIVISOR_L  0x00
+#define MS_MODEM_DIVISOR_H  0x01
+#define MS_MODEM_IIR        0x02
+#define MS_MODEM_FCR        0x02
+#define MS_MODEM_LCR        0x03
+#define MS_MODEM_MCR        0x04
+#define MS_MODEM_LSR        0x05
+#define MS_MODEM_MSR        0x06
+#define MS_MODEM_SCRATCH    0x07
+
+#define MS_MODEM_TYPE_NONE      0
+#define MS_MODEM_TYPE_DET1      1
+#define MS_MODEM_TYPE_DET2      2
+#define MS_MODEM_TYPE_DET1D     3
+#define MS_MODEM_TYPE_UNKNOWN   255
+
+/***************************************************************************************
+ * Library variables
+ * 
+ * Because the library uses the memory at 0xD400-0xD5FF for interrupt handling,
+ *  the variables should be placed in RAM starting at 0xD600.
+ * The linker directive --data-loc 0xD600 can be used for this.
+ ***************************************************************************************/
+
+__at 0xC000 uint8_t ms_screen_buffer[5120];
+__at 0x8000 uint8_t ms_modem_regs[8];
 
 extern ms_screen_t ms_screen;
-
 extern ms_port_shadow_t ms_port_shadow;
-
 extern ms_keyboard_t ms_keyboard;
+extern ms_modem_t ms_modem;
 
 /***************************************************************************************
  * Function prototypes.
@@ -152,8 +181,10 @@ void ms_init_irq(void);
 void ms_init_screen(void);
 void ms_init_keyboard(void);
 
+uint16_t ms_os_version(void);
+
 void ms_screen_clear(void);
-void ms_screen_update(uint8_t *buffer);
+void ms_screen_update(void);
 void ms_screen_update_column(uint8_t column, uint8_t *buffer);
 void ms_screen_scroll(bool refresh);
 void ms_position_cursor(uint8_t x, uint8_t y);
@@ -170,14 +201,23 @@ uint8_t ms_current_bank(void);
 bool ms_add_irq_handler(uint8_t level, uint8_t device, uint8_t bank, void (*handler)(void));
 uint32_t ms_get_timer(void);
 
-bool ms_keyboard_key_available(void);
-uint16_t ms_keyboard_get_key(bool wait);
+bool ms_key_available(void);
+uint16_t ms_get_key(bool wait);
+char ms_translate_key(uint16_t keycode);
 
 void ms_power_off(void);
 void ms_enable_led(bool on);
 void ms_enable_lcd(bool on);
 void ms_cpu_speed(uint8_t speed);
 void ms_irq_speed(uint8_t speed);
+
+bool ms_enable_modem(void);
+void ms_disable_modem(void);
+void ms_init_modem(void);
+void ms_reset_modem(void);
+void ms_modem_write(uint8_t byte);
+uint8_t ms_modem_read(void);
+uint8_t ms_interrogate_modem(void);
 
 extern const uint8_t ms_screen_font[];
 
@@ -266,6 +306,9 @@ extern const uint8_t ms_screen_font[];
 
 #define MS_KEY_NONE         0xFFFF
 
+#define MS_KEYBOARD_OLD     0x00
+#define MS_KEYBOARD_NEW     0x01
+
 /***************************************************************************************
  * Structures for Mailstation OS app identification.
  ***************************************************************************************/
@@ -285,7 +328,7 @@ typedef const struct ms_app_icon_t {
 
 	uint16_t icon0_width;	// Must be 34
 	uint8_t icon0_height;	// Must be 34
-	uint8_t icon0[][];	    // 34 rows, 5 bytes each, to represent 34x34
+	uint8_t icon0[];	    // 34 rows, 5 bytes each, to represent 34x34
 } ms_app_icon_t;
 
 

@@ -56,7 +56,7 @@ void display_ports(void)
     ms_put_string(buffer, false);
     sprintf(buffer, "\nScreen: %02X", ms_screen_type());
     ms_put_string(buffer, false);
-    ms_screen_update(NULL);
+    ms_screen_update();
     time_diff = (ms_get_timer() - timer) & 0xFF;
     if(ms_keyboard.last_key == MS_KEY_POWER) ms_power_off();
 }
