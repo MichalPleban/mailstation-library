@@ -4,9 +4,9 @@
 
 #include "mailstation.h"
 
-void test_ports(void);
-void test_modem(void);
-void test_screen(void);
+//void test_ports(void);
+//void test_modem(void);
+//void test_screen(void);
 void test_type(void);
 
 void main(void)

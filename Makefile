@@ -67,7 +67,8 @@ bin/app-ldr.bin: bin/app.bin
 bin/app.bin: bin/app.ihx
 	objcopy -Iihex -Obinary $< $@
 
-bin/app.ihx: bin/crt0-app.rel bin/libmailstation.lib src/app/app.rel src/app/icon.rel src/app/ports.rel src/app/modem.rel src/app/screen.rel src/app/type.rel
+#bin/app.ihx: bin/crt0-app.rel bin/libmailstation.lib src/app/app.rel src/app/icon.rel src/app/ports.rel src/app/modem.rel src/app/screen.rel src/app/type.rel
+bin/app.ihx: bin/crt0-app.rel bin/libmailstation.lib src/app/app.rel src/app/icon.rel src/app/type.rel
 	$(CC) $(CFLAGS) $(LDFLAGS) --code-loc 0x4030 --data-loc 0xD600 $^ -o $@
 
 src/app/app.rel: src/app/app.c include/mailstation.h
@@ -76,14 +77,14 @@ src/app/app.rel: src/app/app.c include/mailstation.h
 src/app/icon.rel: src/app/icon.c include/mailstation.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-src/app/ports.rel: src/app/ports.c include/mailstation.h
-	$(CC) $(CFLAGS) -c $< -o $@
+#src/app/ports.rel: src/app/ports.c include/mailstation.h
+#	$(CC) $(CFLAGS) -c $< -o $@
 
-src/app/modem.rel: src/app/modem.c include/mailstation.h
-	$(CC) $(CFLAGS) -c $< -o $@
+#src/app/modem.rel: src/app/modem.c include/mailstation.h
+#	$(CC) $(CFLAGS) -c $< -o $@
 
-src/app/screen.rel: src/app/screen.c include/mailstation.h
-	$(CC) $(CFLAGS) -c $< -o $@
+#src/app/screen.rel: src/app/screen.c include/mailstation.h
+#	$(CC) $(CFLAGS) -c $< -o $@
 
 src/app/type.rel: src/app/type.c include/mailstation.h
 	$(CC) $(CFLAGS) -c $< -o $@

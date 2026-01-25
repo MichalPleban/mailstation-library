@@ -10,12 +10,11 @@ void test_type(void)
     char c;
     char buffer[80];
 
-    ms_screen_clear();
-    sprintf(buffer, "Mailstation OS Version: %02X\n", ms_os_version());
-    ms_put_string(buffer, true);
+    ms_put_string("Free type demo:\n", true);
     while(true)
     {
         key = ms_get_key(true);
+        if(key == MS_KEY_POWER) ms_power_off();
         c = ms_translate_key(key);
         if(c) ms_put_char(c, true);
     }
