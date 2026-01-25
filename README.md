@@ -1,4 +1,4 @@
-# Mailstaion support libary
+# Mailstation support libary
 
 This library is intended to server as a stand-alone (i.e. not using any routines of the underlying operationg system) library of functions to develop applications for the [Cidco Mailstation](https://github.com/MichalPleban/mailstation-hardware) computer. The library works on all Z80-based Mailstation models, including DET1, DET2, DET1D and DET1E.
 
