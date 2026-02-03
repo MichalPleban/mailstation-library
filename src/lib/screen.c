@@ -91,14 +91,8 @@ void ms_draw_string(const char *str, int length, bool refresh)
 
 void ms_screen_scroll(bool refresh)
 {
-    volatile uint8_t *src_ptr = ms_screen_buffer;
-
-    for(unsigned char i = 0; i < 40; i++)
-    {
-        memcpy(src_ptr + 8, src_ptr, 128 - 8);
-        memset(src_ptr + 128 - 8, 0x00, 8);
-        src_ptr += 128;
-    }
+    memcpy((void*)ms_screen_buffer, (void*)(ms_screen_buffer + 320), sizeof(ms_screen_buffer) - 320);
+    memset((void*)(ms_screen_buffer + sizeof(ms_screen_buffer) - 320), 0x00, 320);
     if(refresh) ms_screen_update();
 }
 
@@ -111,7 +105,7 @@ void ms_advance_cursor(bool scroll, bool refresh_on_scroll)
         ms_screen.cursor_y += 1;
         if(ms_screen.cursor_y >= 16)
         {
-            ms_screen.cursor_y = 16;
+            ms_screen.cursor_y = 15;
             if(scroll) ms_screen_scroll(refresh_on_scroll);
         }
     }
@@ -129,7 +123,7 @@ void ms_put_char(char c, bool refresh)
             ms_screen.cursor_y++;
             if(ms_screen.cursor_y >= 16)
             {
-                ms_screen.cursor_y = 16;
+                ms_screen.cursor_y = 15;
                 ms_screen_scroll(refresh);
             }
             break;
