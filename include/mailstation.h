@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <time.h>
 
 /***************************************************************************************
  * Data structures used by the library.
@@ -210,6 +211,8 @@ void ms_enable_led(bool on);
 void ms_enable_lcd(bool on);
 void ms_cpu_speed(uint8_t speed);
 void ms_irq_speed(uint8_t speed);
+
+void ms_get_time(struct tm *timeinfo);
 
 bool ms_enable_modem(void);
 void ms_disable_modem(void);

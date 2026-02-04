@@ -24,7 +24,7 @@ bin/crt0-%.rel: src/crt0/crt0-%.s
 # The library
 ################################################################################
 
-LIB_OBJECTS = src/lib/init.rel src/lib/screen.rel src/lib/irq.rel src/lib/irq_handler.rel src/lib/port.rel src/lib/font.rel src/lib/kbd.rel src/lib/modem.rel
+LIB_OBJECTS = src/lib/init.rel src/lib/screen.rel src/lib/irq.rel src/lib/irq_handler.rel src/lib/port.rel src/lib/font.rel src/lib/kbd.rel src/lib/modem.rel src/lib/time.rel
 
 lib: bin/libmailstation.lib
 
@@ -50,6 +50,9 @@ src/lib/kbd.rel: src/lib/kbd.c include/mailstation.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 src/lib/modem.rel: src/lib/modem.c include/mailstation.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+src/lib/time.rel: src/lib/time.c include/mailstation.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 src/lib/font.rel: src/lib/font.c include/mailstation.h
